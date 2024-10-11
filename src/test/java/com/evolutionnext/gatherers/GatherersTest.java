@@ -100,7 +100,8 @@ public class GatherersTest {
             return i;
         };
 
-        IntStream.range(0, 10).boxed().parallel().gather(Gatherers.mapConcurrent(2, debugFunction)).forEach(debugConsumer);
+        //Add parallel to see results
+        IntStream.range(0, 10).boxed().gather(Gatherers.mapConcurrent(2, debugFunction)).forEach(debugConsumer);
     }
 
     /**
