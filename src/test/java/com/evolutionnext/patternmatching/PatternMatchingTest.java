@@ -51,4 +51,10 @@ public class PatternMatchingTest {
         String result = PatternMatching.matchRecordPatternsWithWinningRecords(mariners);
         assertThat(result).isEqualTo("Team Twins from Minnesota has a winning record");
     }
+
+    @Test
+    void testWithPrimitives() {
+        String s = PatternMatching.matchWithPrimitive(0);
+        assertThat(s).isEqualTo("zero");
+    }
 }

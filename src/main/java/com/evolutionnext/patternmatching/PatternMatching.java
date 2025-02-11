@@ -97,4 +97,12 @@ public class PatternMatching {
                 String.format("Team %s from %s has a losing record", name, city);
         };
     }
+
+    public static String matchWithPrimitive(int i) {
+        return switch (i) {
+            case 0 -> "Zero";
+            case 1 -> "One";
+            default -> "Other";
+        };
+    }
 }

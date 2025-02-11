@@ -1,1 +1,1 @@
-java --enable-preview --source=22 Prog.java
+java --enable-preview --source=23 Prog.java

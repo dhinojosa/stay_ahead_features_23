@@ -52,9 +52,9 @@ public class UnnamedVariablesTest {
         String s = "Oh oh";
         try {
             int i = Integer.parseInt(s);
-            System.out.println(STR."Amount is \{i}");
+            System.out.format("Amount is %d", i);
         } catch (NumberFormatException _) {        // Unnamed variable
-            System.out.println(STR."Bad number: \{s}");
+            System.out.format("Bad number");
         }
     }
 
@@ -67,7 +67,8 @@ public class UnnamedVariablesTest {
 
     @Test
     void testWithinALambda() {
-        Optional<Integer> result = Stream.of(1, 10).reduce((integer, _) -> integer + 1);
+        Optional<Integer> result =
+            Stream.of(1, 10).reduce((integer, _) -> integer + 1);
         assertThat(result).isPresent();
         assertThat(result.get()).isEqualTo(2);
     }

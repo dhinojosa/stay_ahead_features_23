@@ -8,10 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Gatherer;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 @SuppressWarnings("preview")
 public class SimpleGathererTest {
@@ -62,11 +59,11 @@ public class SimpleGathererTest {
 
             @Override
             public BiConsumer<ArrayList<Integer>, Downstream<? super List<Integer>>> finisher() {
-               return (state, downstream) -> {
-                   if (isPrime(state.stream().mapToInt(x -> x).sum()) || state.size() == 10) {
-                       downstream.push(state);
-                   }
-               };
+                return (state, downstream) -> {
+                    if (isPrime(state.stream().mapToInt(x -> x).sum()) || state.size() == 10) {
+                        downstream.push(state);
+                    }
+                };
             }
         };
         List<List<Integer>> actual = IntStream.rangeClosed(1, 50).boxed().gather(gatherer).collect(Collectors.toList());
@@ -101,10 +98,12 @@ public class SimpleGathererTest {
 
     @Test
     void testGathererNonGreedy() {
-        Gatherer.Integrator<ArrayList<Integer>, Integer, List<Integer>> nonGreedyIntegrator = Gatherer.Integrator.of((state, element, downstream) -> {
+        Gatherer.Integrator<ArrayList<Integer>, Integer, List<Integer>> nonGreedyIntegrator =
+            Gatherer.Integrator.of((state, element, downstream) -> {
             state.add(element);
             if (state.size() == 10) {
                 ArrayList<Integer> downstreamList = new ArrayList<>(state);
+                System.out.println("Pushing Downstream");
                 downstream.push(downstreamList);
                 state.removeAll(downstreamList);
             }
@@ -115,6 +114,7 @@ public class SimpleGathererTest {
             integers.addAll(integers2);
             return integers;
         }, (integers, downstream) -> {
+            System.out.println("Remaining processed");
             if (integers.size() == 10) {
                 downstream.push(integers);
             }
@@ -123,32 +123,35 @@ public class SimpleGathererTest {
         System.out.println(Stream.iterate(1, i -> i + 1).gather(nonGreedyGatherer).limit(100).toList());
 
     }
+
     @Test
     void testGathererGreedy() {
-        Gatherer.Integrator.Greedy<ArrayList<Integer>, Integer, List<Integer>> greedyIntegrator = Gatherer.Integrator.ofGreedy((state, element, downstream) -> {
-            state.add(element);
-            if (state.size() == 10) {
-                ArrayList<Integer> downstreamList = new ArrayList<>(state);
-                downstream.push(downstreamList);
-                state.removeAll(downstreamList);
-            }
-            return true;
-        });
+        Gatherer.Integrator.Greedy<ArrayList<Integer>, Integer, List<Integer>> greedyIntegrator =
+            Gatherer.Integrator.ofGreedy((state, element, downstream) -> {
+                state.add(element);
+                if (state.size() == 10) {
+                    ArrayList<Integer> downstreamList = new ArrayList<>(state);
+                    System.out.println("Pushing Downstream");
+                    downstream.push(downstreamList);
+                    state.removeAll(downstreamList);
+                }
+                return true;
+            });
 
 
+        Gatherer<Integer, ArrayList<Integer>, List<Integer>> greedyGatherer = Gatherer.of(
+            ArrayList::new, greedyIntegrator, (integers, integers2) -> {
+                integers.addAll(integers2);
+                return integers;
+            }, (integers, downstream) -> {
+                System.out.println("Remaining processed");
+                if (integers.size() == 10) {
+                    downstream.push(integers);
+                }
+            });
 
-        Gatherer<Integer, ArrayList<Integer>, List<Integer>> greedyGatherer = Gatherer.of(ArrayList::new, greedyIntegrator, (integers, integers2) -> {
-            integers.addAll(integers2);
-            return integers;
-        }, (integers, downstream) -> {
-            if (integers.size() == 10) {
-                downstream.push(integers);
-            }
-        });
 
-
-
-        System.out.println(Stream.iterate(1, i -> i + 1).gather(greedyGatherer).limit(10).toList());
+        System.out.println(Stream.iterate(1, i -> i + 1).gather(greedyGatherer).limit(100).toList());
 
     }
 }
