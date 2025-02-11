@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Gatherer;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class GroupByGatherer {
 
@@ -28,7 +29,7 @@ public class GroupByGatherer {
 
         @Override
         public Integrator<HashMap<K, List<T>>, T, Map.Entry<K, List<T>>> integrator() {
-            return (state, element, _) -> {
+            return (state, element,  _) -> {
                 K result = groupFunction.apply(element);
                 state.computeIfAbsent(result, _ -> new ArrayList<>());
                 state.get(result).add(element);
@@ -46,9 +47,10 @@ public class GroupByGatherer {
         }
     }
 
+
     public static void main(String[] args) {
-        System.out.println(IntStream.range(0, 100).boxed()
-            .gather(GroupBy.groupBy(i -> i % 2 == 0 ? "even" : "odd"))
-            .collect(Collectors.toList()));
+
+
+
     }
 }

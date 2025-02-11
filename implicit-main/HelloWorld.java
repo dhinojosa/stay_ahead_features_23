@@ -1,6 +1,4 @@
-
-   void main() {
-        System.out.format("Hello, World %s", getState());
-    }
-
-    String getState() {return "Iowa";}
+import static java.lang.System.out;
+public void main() {
+    println("Hello World!");
+}
