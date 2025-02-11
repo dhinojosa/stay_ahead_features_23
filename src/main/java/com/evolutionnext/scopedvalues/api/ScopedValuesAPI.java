@@ -53,7 +53,7 @@ public class ScopedValuesAPI {
     /**
      * Synonymous with where().get()
      */
-    private static void getWhere() {
+    private static void getWhere() throws Exception {
         String outerResult = ScopedValue.callWhere(GREETING_KEY, "Hola", () -> {
             try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
                 var result = scope.fork(() -> String.format("%s!", GREETING_KEY.get()));
