@@ -4,13 +4,14 @@ package com.evolutionnext.streamgatherers;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
 import java.util.function.Supplier;
-import java.util.stream.*;
+import java.util.stream.Collectors;
+import java.util.stream.Gatherer;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @SuppressWarnings("preview")
 public class SimpleGathererTest {
