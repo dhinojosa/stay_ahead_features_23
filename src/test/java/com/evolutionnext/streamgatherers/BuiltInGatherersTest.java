@@ -25,7 +25,8 @@ public class BuiltInGatherersTest {
     @Test
     void testFold() {
         Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).gather(Gatherers.fold(() -> "",
-                (s, integer) -> s.concat(String.valueOf(integer)))).map(s -> "$" + s + "$")
+                (s, integer) -> s.concat(String.valueOf(integer))))
+            .map(s -> "$" + s + "$")
             .forEach(System.out::println);
     }
 
@@ -39,9 +40,9 @@ public class BuiltInGatherersTest {
      */
     @Test
     void testScan() {
-        Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).gather(Gatherers.scan(() -> 100, (current, next) -> {
-            System.out.printf("Current: %d\tNext: %d%n", current, next);
-            return current + next;
+        Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).gather(Gatherers.scan(() -> 0, (aggregate, next) -> {
+            System.out.printf("Current: %d\tNext: %d%n", aggregate, next);
+            return aggregate + next;
         })).forEach(System.out::println);
     }
 
@@ -126,6 +127,4 @@ public class BuiltInGatherersTest {
 
         System.out.println(t);
     }
-
-
 }

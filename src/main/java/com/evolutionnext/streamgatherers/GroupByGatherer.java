@@ -43,7 +43,8 @@ public class GroupByGatherer {
 
         @Override
         public BiConsumer<HashMap<K, List<T>>, Downstream<? super Map.Entry<K, List<T>>>> finisher() {
-            return (kListHashMap, downstream) -> kListHashMap.entrySet().forEach(downstream::push);
+            return (kListHashMap, downstream) ->
+                kListHashMap.entrySet().forEach(downstream::push);
         }
     }
 
