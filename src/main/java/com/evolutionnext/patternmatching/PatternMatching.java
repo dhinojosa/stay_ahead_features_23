@@ -65,7 +65,7 @@ public class PatternMatching {
 
     public static String matchRecordPatternsWithUnnamedVariables(Object object) {
         return switch (object) {
-            case Team(String city, String name, int _, int _) ->
+            case Team(String city, String name, int _, _) ->
                 String.format("Team %s from %s", name, city);
             case Integer i -> String.format("int %d", i);
             case Long l    -> String.format("long %d", l);
@@ -77,7 +77,8 @@ public class PatternMatching {
 
     public static String matchRecordPatternsWhen(Object object) {
         return switch (object) {
-            case Team(String city, String name, int _, int _) when city.startsWith("M") ->
+            case Team(String city, String name, int _, int _)
+                when city.startsWith("M") ->
                 String.format("Team %s from %s, a city that starts with M", name, city);
             case Team(String city, String name, int _, int _) ->
                 String.format("Team %s from %s", name, city);
