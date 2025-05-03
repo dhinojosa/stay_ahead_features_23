@@ -54,7 +54,8 @@ public class PatternMatching {
     public static String matchRecordPatterns(Object object) {
         return switch (object) {
             case Team(String city, String name, int wins, int losses) ->
-                String.format("Team %s from %s with a record of (%d-%d)", name, city, wins, losses);
+                String.format("Team %s from %s with a record of (%d-%d)",
+                    name, city, wins, losses);
             case Integer i -> String.format("int %d", i);
             case Long l    -> String.format("long %d", l);
             case Double d  -> String.format("double %f", d);
@@ -92,7 +93,8 @@ public class PatternMatching {
 
     public static String matchRecordPatternsWithWinningRecords(Team team) {
         return switch (team) {
-            case Team(String city, String name, int wins, int losses) when wins > losses ->
+            case Team(String city, String name, int wins, int losses)
+                when wins > losses ->
                 String.format("Team %s from %s has a winning record", name, city);
             case Team(String city, String name, int _, int _) ->
                 String.format("Team %s from %s has a losing record", name, city);
