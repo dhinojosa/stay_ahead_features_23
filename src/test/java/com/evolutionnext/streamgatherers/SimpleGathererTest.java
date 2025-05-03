@@ -17,6 +17,38 @@ import java.util.stream.Stream;
 
 @SuppressWarnings("preview")
 public class SimpleGathererTest {
+
+    @Test
+    void testMakeAHandcraftedGatherer() {
+
+    }
+
+    @Test
+    void testSimpleGatherer() {
+        Gatherer<Integer, List<Integer>, List<Integer>> myGatherer =
+            new Gatherer<>() {
+                @Override
+                public Supplier<List<Integer>> initializer() {
+                    return ArrayList::new;
+                }
+
+                @Override
+                public Integrator<List<Integer>, Integer, List<Integer>> integrator() {
+                    return (state, element, downstream) -> {
+                        state.add(element);
+                        if (state.size() == 10) {
+                            ArrayList<Integer> downstreamList = new ArrayList<>(state);
+                            downstream.push(downstreamList);
+                            state.clear();
+                        }
+
+                        return true;
+                    };
+                }
+            };
+            Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).gather(myGatherer).toList();
+    }
+
     @Test
     void testBundleBy10Gatherer() {
         var gatherer = new Gatherer<Integer, ArrayList<Integer>, List<Integer>>() {
@@ -38,7 +70,11 @@ public class SimpleGathererTest {
                 };
             }
         };
-        List<List<Integer>> actual = IntStream.rangeClosed(1, 50).boxed().gather(gatherer).collect(Collectors.toList());
+        List<List<Integer>> actual = IntStream
+            .rangeClosed(1, 50)
+            .boxed()
+            .gather(gatherer)
+            .collect(Collectors.toList());
         List<List<Integer>> expectedList = List.of(
             List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
             List.of(11, 12, 13, 14, 15, 16, 17, 18, 19, 20),
@@ -121,6 +157,7 @@ public class SimpleGathererTest {
 
     @Test
     void testGathererOfStaticMethod() {
+        /* Notice this is lambda and separate */
         Gatherer.Integrator<ArrayList<Integer>, Integer, List<Integer>> integrator =
             (state, element, downstream) -> {
                 state.add(element);
@@ -131,6 +168,8 @@ public class SimpleGathererTest {
                 }
                 return true;
             };
+
+        /* Notice this is lambda and separate */
         Gatherer<Integer, ArrayList<Integer>, List<Integer>> gatherer =
             Gatherer.of(ArrayList::new, integrator, (integers, integers2) -> {
                 integers.addAll(integers2);
@@ -146,14 +185,15 @@ public class SimpleGathererTest {
             List.of(21, 22, 23, 24, 25, 26, 27, 28, 29, 30),
             List.of(31, 32, 33, 34, 35, 36, 37, 38, 39, 40),
             List.of(41, 42, 43, 44, 45, 46, 47, 48, 49, 50),
-            List.of(41, 42, 43)
+            List.of(51, 52, 53)
         );
         Assertions.assertThat(actual).isEqualTo(expectedList);
     }
 
     @Test
     void testStatelessGatherer() {
-        Gatherer<Integer, Void, Integer> customFlatMap = Gatherer.of((_, element, downstream) -> {
+        Gatherer<Integer, Void, Integer> customFlatMap =
+            Gatherer.of((_, element, downstream) -> {
             downstream.push(element);
             downstream.push(element + 1);
             downstream.push(element + 2);
@@ -216,34 +256,7 @@ public class SimpleGathererTest {
 
 
     @Test
-    void testGathererNonGreedy() {
-        Gatherer.Integrator<ArrayList<Integer>, Integer, List<Integer>> nonGreedyIntegrator =
-            Gatherer.Integrator.of((state, element, downstream) -> {
-                System.out.printf("Integrator Invoked %s%n", LocalDateTime.now());
-                state.add(element);
-                if (state.size() == 10) {
-                    ArrayList<Integer> downstreamList = new ArrayList<>(state);
-                    System.out.println("Pushing Downstream");
-                    downstream.push(downstreamList);
-                    state.removeAll(downstreamList);
-                }
-                return true;
-            });
-
-        Gatherer<Integer, ArrayList<Integer>, List<Integer>> nonGreedyGatherer = Gatherer.of(ArrayList::new, nonGreedyIntegrator, (integers, integers2) -> {
-            integers.addAll(integers2);
-            return integers;
-        }, (integers, downstream) -> {
-            downstream.push(integers);
-        });
-
-        System.out.println(Stream.iterate(1, i -> i + 1)
-            .gather(nonGreedyGatherer).limit(100).toList());
-
-    }
-
-    @Test
-    void testGathererGreedy2() {
+    void testGathererGreedy() {
         Gatherer.Integrator.Greedy<List<Integer>, Integer, Double> listIntegerDoubleGreedyIntegrator =
             Gatherer.Integrator.ofGreedy((state, element, downstream) -> {
                 System.out.printf("Integrator Invoked %s on Thread %s%n", LocalDateTime.now(), Thread.currentThread());
@@ -263,7 +276,7 @@ public class SimpleGathererTest {
     }
 
     @Test
-    void testGathererNonGreedy2() {
+    void testGathererNonGreedy() {
         //Not use iterator
         //Tried to merge both Gatherer.collect
         //tryAdvance regular
@@ -286,38 +299,6 @@ public class SimpleGathererTest {
             Gatherer.ofSequential(ArrayList::new, listIntegerDoubleIntegrator);
 
         IntStream.range(0, 1000).boxed().gather(gatherer).forEach(System.out::println);
-    }
-
-    @Test
-    void testGathererGreedy() {
-        Gatherer.Integrator.Greedy<ArrayList<Integer>, Integer, List<Integer>> greedyIntegrator =
-            Gatherer.Integrator.ofGreedy((state, element, downstream) -> {
-                System.out.printf("Integrator Invoked %s%n", LocalDateTime.now());
-                state.add(element);
-                if (state.size() == 10) {
-                    ArrayList<Integer> downstreamList = new ArrayList<>(state);
-                    System.out.printf("Pushing Downstream: %s%n", state);
-                    downstream.push(downstreamList);
-                    state.removeAll(downstreamList);
-                }
-                return true;
-            });
-
-
-        Gatherer<Integer, ArrayList<Integer>, List<Integer>> greedyGatherer = Gatherer.of(
-            ArrayList::new, greedyIntegrator, (integers, integers2) -> {
-                integers.addAll(integers2);
-                return integers;
-            }, (integers, downstream) -> {
-                downstream.push(integers);
-            });
-
-
-        System.out.println(Stream.iterate(1, i -> i + 1)
-            .gather(greedyGatherer)
-            .limit(100)
-            .toList());
-
     }
 
 
