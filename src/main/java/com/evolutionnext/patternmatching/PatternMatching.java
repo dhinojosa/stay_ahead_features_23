@@ -33,7 +33,7 @@ public class PatternMatching {
     }
 
     public static void matchString(String s) {
-        switch (s) {
+        switch (s) { //switch statement
             case null         -> System.out.println("Oops");
             case "Foo", "Bar" -> System.out.println("Great");
             default           -> System.out.println("Ok");
