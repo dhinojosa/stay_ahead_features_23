@@ -21,3 +21,7 @@ buildNumber.properties
 gensrc/
 
 multi-file/dependencies/libs
+/stablevalues/lib/log4j-api-2.21.1.jar
+/stablevalues/lib/log4j-core-2.21.1.jar
+/stablevalues/lib/log4j-slf4j2-impl-2.21.1.jar
+/stablevalues/lib/slf4j-api-2.0.9.jar
